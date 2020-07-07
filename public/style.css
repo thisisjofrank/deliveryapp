@@ -1,8 +1,12 @@
 #map {
-  height: 400px;  
+  height: calc(100vh - 86px);  
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+h1 {
+  margin: 0.6em 0;
 }
 
 .historyContainer .item {
