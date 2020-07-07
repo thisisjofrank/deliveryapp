@@ -1,0 +1,14 @@
+#map {
+  height: 400px;  
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.historyContainer .item {
+    height: 300px;
+    border: 1px solid black;
+    overflow: hidden;
+    padding: 20px;
+    margin-top: 10px;
+  }  
