@@ -3,6 +3,7 @@ const Ably = require('ably/promises');
 require('dotenv').config()
 
 const client = new Ably.Realtime(process.env.ABLY_API_KEY);
+const port = process.env.PORT || 5000;
 
 const app = express();
 app.get("/", async (request, response) => {
@@ -18,4 +19,4 @@ app.get("/api/createTokenRequest", async (request, response) => {
   
 app.use(express.static('public'))
 
-app.listen(process.env.PORT, () => console.log(`Example app listening at http://localhost:${process.env.PORT}`))
+app.listen(process.env.PORT , () => console.log(`Example app listening at http://localhost:${process.env.PORT}`))
