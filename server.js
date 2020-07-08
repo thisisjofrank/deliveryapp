@@ -19,4 +19,4 @@ app.get("/api/createTokenRequest", async (request, response) => {
   
 app.use(express.static('public'))
 
-app.listen(process.env.PORT , () => console.log(`Example app listening at http://localhost:${process.env.PORT}`))
+app.listen(port, () => console.log(`Example app listening at http://localhost:${process.env.PORT}`))
