@@ -9,6 +9,17 @@ import { Vehicle } from "./Vehicle.js";
   const origin = new google.maps.LatLng(position.latitude, position.longitude);
   const map = new google.maps.Map(mapElement, { center: origin, zoom: 16 });
 
+  const speed = document.getElementById("speed");
+  const animation = document.getElementById("animation");
+
+  animation.onchange = function(el) {
+    console.log(el.target.checked);
+  }
+
+  speed.onchange = function(el) {
+    console.log(el.target.checked);
+  }
+
   // End of map setup.
 
   const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
@@ -17,7 +28,6 @@ import { Vehicle } from "./Vehicle.js";
   const channelId = `rider002.delivery223.locations`;
   
   const channel = await ably.channels.get(channelId, {params: {rewind: '1'}});
-
 
   await channel.attach();
 
@@ -49,6 +59,7 @@ channel.subscribe(function(message) {
       longitude: vehicle.Lon
     });
   });
+
   // channel.subscribe(function(message) {
   //   console.log("Received", message);
 
