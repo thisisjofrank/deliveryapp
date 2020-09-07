@@ -1,22 +1,22 @@
 export class Vehicle {
-    constructor(id, latLong, follow) {
+    constructor(id, latLong, follow, map) {
       this.id = id;
       this.follow = follow || false;
       
-      this.position = new google.maps.LatLng(latLong.latitude, latLong.longitude);
-      
-      this.line = new google.maps.Polyline({
-        geodesic: true,
-        path: [this.position, this.position],
-        strokeColor: '#FF0000',
-        strokeOpacity: 0,
-        icons: [ { icon: car(), offset: '100%' } ]
-      })
+      this.position = latLong;
+      this.map = map;
+
+      this.el = document.createElement('div');
+      this.el.className = 'marker';
+
+      this.marker = new mapboxgl.Marker(this.el)
+        .setLngLat([latLong.longitude, latLong.latitude])
+        .addTo(this.map);
     }
   
-    async move(destinationLatLong) { 
+    async move(destinationLatLong) {
 
-        const currentPosAtLatLong = { latitude: this.position.lat(), longitude: this.position.lng() };        
+        const currentPosAtLatLong = { latitude: this.position.latitude, longitude: this.position.longitude };        
         const routeResponse = await TryGetRoute(currentPosAtLatLong, destinationLatLong);
         
         if (routeResponse == null) {
@@ -24,16 +24,42 @@ export class Vehicle {
             return;
         }
 
-        const pathAsLatLongs = routeResponse.routes[0].overview_path;
+        const pathAsLatLongs = routeResponse.geometry.coordinates; // Array of [lng, lat]
 
-        if (pathAsLatLongs.length == 0 || pathAsLatLongs.length == 1) {
+        if (pathAsLatLongs.length <= 1) {
             console.log("Path didn't contain enough points to follow.")
             return;
         }
 
-        this.line.get("icons")[0].offset = "0%";
-        this.line.setPath(pathAsLatLongs);
+        let marker = this.marker;
+        let map = this.map;
+
+        let start;
+        function animateMarker(timestamp) {
+            if (start === undefined) {
+                start = timestamp;
+            }
+
+            const elapsed = timestamp - start;
+
+            /*marker.setLngLat([
+                Math.cos(timestamp / 1000) * radius,
+                Math.sin(timestamp / 1000) * radius
+            ]);
+             
+            marker.addTo(map);*/
+
+            console.log(elapsed);
+
+            if (elapsed < 2000) { 
+                window.requestAnimationFrame(animateMarker);
+            }
+        }
     
+        window.requestAnimationFrame(animateMarker);
+
+    
+        /*
         let count = 0;
         const speed = 100;
         const percentDivisor = speed / 100;
@@ -54,7 +80,7 @@ export class Vehicle {
                     this.line.map.panTo(this.position);
                 }
             }
-        }, 30);
+        }, 30);*/
     }
 }
 
@@ -68,24 +94,24 @@ async function TryGetRoute(start, end) {
 }
   
 async function GetRoute(start, end) {  
-    var directionsService = new google.maps.DirectionsService();
+    const directionsApi = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson&access_token=pk.eyJ1IjoidGhpc2lzam9mcmFuayIsImEiOiJjazl0dTkzZGIwMGY0M2ZwYXlidzBqc2VqIn0._NdPXGNS5xrGsepZgesYWQ`;
     
-    const promise = new Promise((res, rej) => {
-      directionsService.route({
-          origin: `${start.latitude},${start.longitude}`,
-          destination: `${end.latitude},${end.longitude}`,
-          travelMode: "TRANSIT",
-          transitOptions: {
-              modes: ["BUS"]
-          }
-        },
-        function(response, status) {
-          if (status == "OK") { res(response); } else { rej(response); }
+    const response = await fetch(directionsApi);
+    const responseJson = await response.json();
+    console.log(responseJson);
+
+    const route = responseJson.routes[0];
+    return route;
+    
+    /*
+    return {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: route
         }
-      );
-    });
-  
-    return promise;
+      };*/
 }
 
 const car = () => {
@@ -97,6 +123,6 @@ const car = () => {
       fillColor: '#FF69B4',
       fillOpacity: 1,
       rotation: -90,
-      anchor: new google.maps.Point(50, 100)
+      //anchor: new google.maps.Point(50, 100)
     }
 };

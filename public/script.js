@@ -2,12 +2,16 @@ import { Vehicle } from "./Vehicle.js";
 
 (async function() {
 
-  let position = { latitude: 37.33757937, longitude: -122.04068128999999 };
-  // let position = { latitude: 41.772621154785156, longitude: -72.69306182861328 };
+  const position = { latitude: 37.33757937, longitude: -122.04068128999999 };
 
-  const mapElement = document.getElementById("map");
-  const origin = new google.maps.LatLng(position.latitude, position.longitude);
-  const map = new google.maps.Map(mapElement, { center: origin, zoom: 16 });
+  mapboxgl.accessToken = 'pk.eyJ1IjoidGhpc2lzam9mcmFuayIsImEiOiJjazl0dTkzZGIwMGY0M2ZwYXlidzBqc2VqIn0._NdPXGNS5xrGsepZgesYWQ';
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+    center: [position.longitude, position.latitude],
+    zoom: 15
+  });
 
   const speed = document.getElementById("speed");
   const animation = document.getElementById("animation");
@@ -23,66 +27,39 @@ import { Vehicle } from "./Vehicle.js";
   // End of map setup.
 
   const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
- // const channelId = `[product:cttransit/gtfsr]vehicle:1450`;
-
-  const channelId = `rider002.delivery223.locations`;
-  
-  const channel = await ably.channels.get(channelId, {params: {rewind: '1'}});
+  const channelId = `rider002.delivery223.locations`;  
+  const channel = await ably.channels.get(channelId/*, {params: {rewind: '1'}}*/);
 
   await channel.attach();
 
-  const busses = new Map();
-
   const riders = new Map();
 
-channel.subscribe(function(message) {
+  channel.subscribe((message) => {
     console.log("Received", message);
 
     const vehicle = JSON.parse(message.data);
-    const riderID = vehicle.id;
+    const riderId = vehicle.id;
 
-    if (!riders.has(riderID)) {
-      const newBus = new Vehicle(riderID, { 
+    if (!riders.has(riderId)) {
+
+      console.log(vehicle)
+
+      const newRider = new Vehicle(riderId, { 
         latitude: vehicle.Lat,
         longitude: vehicle.Lon
-      }, true);
+      }, true, map);
 
-      riders.set(riderID, newBus);      
-      newBus.line.setMap(map);
-      map.panTo(newBus.line.getPath().getAt(1));
+      riders.set(riderId, newRider);      
+      //newRider.line.setMap(map);
+      map.panTo(newRider.line.getPath().getAt(1));
     }
 
-    const bus = riders.get(riderID);
+    const rider = riders.get(riderId);
     
-    bus.move({ 
+    rider.move({ 
       latitude: vehicle.Lat,
       longitude: vehicle.Lon
     });
   });
-
-  // channel.subscribe(function(message) {
-  //   console.log("Received", message);
-
-  //   const vehicle = message.data.vehicle;
-  //   const busId = vehicle.vehicle.id;
-
-  //   if (!busses.has(busId)) {
-  //     const newBus = new Vehicle(busId, { 
-  //       latitude: vehicle.position.latitude,
-  //       longitude: vehicle.position.longitude
-  //     }, true);
-
-  //     busses.set(busId, newBus);      
-  //     newBus.line.setMap(map);
-  //     map.panTo(newBus.line.getPath().getAt(1));
-  //   }
-
-  //   const bus = busses.get(busId);
-    
-  //   bus.move({ 
-  //     latitude: vehicle.position.latitude,
-  //     longitude: vehicle.position.longitude
-  //   });
-  // });
 
 })();

@@ -17,3 +17,10 @@ In the project root run:
 ```bash
 npm run start
 ```
+
+---
+
+
+- swap the google maps to mapbox maps
+- swap polyline google maps bit to mapbox polyline - routfinding stuff
+- vehcile follow line
