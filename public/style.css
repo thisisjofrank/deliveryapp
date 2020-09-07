@@ -110,7 +110,23 @@ input:checked + .slider:before {
 }
 
 .marker {
-  width: 20px;
-  height: 20px;
-  background-color: red;
+  width: 40px;
+  height: 40px;
+  background: url(van.png);
+}
+
+[data-direction="down"] {
+  background-position: top center;
+}
+
+[data-direction="up"] {
+  background-position: center -40px ;
+}
+
+[data-direction="left"] {
+  background-position: center -80px;
+}
+
+[data-direction="right"] {
+  background-position: bottom center;
 }

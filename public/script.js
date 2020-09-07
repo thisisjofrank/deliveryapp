@@ -8,27 +8,16 @@ import { Vehicle } from "./Vehicle.js";
 
   var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+    style: 'mapbox://styles/mapbox/streets-v11',
     center: [position.longitude, position.latitude],
     zoom: 15
   });
-
-  const speed = document.getElementById("speed");
-  const animation = document.getElementById("animation");
-
-  animation.onchange = function(el) {
-    console.log(el.target.checked);
-  }
-
-  speed.onchange = function(el) {
-    console.log(el.target.checked);
-  }
 
   // End of map setup.
 
   const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
   const channelId = `rider002.delivery223.locations`;  
-  const channel = await ably.channels.get(channelId/*, {params: {rewind: '1'}}*/);
+  const channel = ably.channels.get(channelId);
 
   await channel.attach();
 
@@ -41,9 +30,6 @@ import { Vehicle } from "./Vehicle.js";
     const riderId = vehicle.id;
 
     if (!riders.has(riderId)) {
-
-      console.log(vehicle)
-
       const newRider = new Vehicle(riderId, { 
         latitude: vehicle.Lat,
         longitude: vehicle.Lon
@@ -51,7 +37,6 @@ import { Vehicle } from "./Vehicle.js";
 
       riders.set(riderId, newRider);      
       map.flyTo({center: [newRider.position.longitude, newRider.position.latitude], essential: true});
-
     }
 
     const rider = riders.get(riderId);
