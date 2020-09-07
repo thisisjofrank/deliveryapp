@@ -51,7 +51,7 @@ import { Vehicle } from "./Vehicle.js";
 
       riders.set(riderId, newRider);      
       //newRider.line.setMap(map);
-      map.panTo(newRider.line.getPath().getAt(1));
+      //map.panTo(newRider.line.getPath().getAt(1));
     }
 
     const rider = riders.get(riderId);

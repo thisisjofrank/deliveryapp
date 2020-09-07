@@ -16,15 +16,16 @@ export class Vehicle {
   
     async move(destinationLatLong) {
 
-        const currentPosAtLatLong = { latitude: this.position.latitude, longitude: this.position.longitude };        
-        const routeResponse = await TryGetRoute(currentPosAtLatLong, destinationLatLong);
+        const routeResponse = await TryGetRoute(this.position, destinationLatLong);
         
         if (routeResponse == null) {
             console.log("Couldn't find a path.");
             return;
         }
 
-        const pathAsLatLongs = routeResponse.geometry.coordinates; // Array of [lng, lat]
+        const pathAsLatLongs = routeResponse.geometry.coordinates.map(array => { 
+            return { longitude: array[0], latitude: array[1] };
+        });
 
         if (pathAsLatLongs.length <= 1) {
             console.log("Path didn't contain enough points to follow.")
@@ -34,29 +35,69 @@ export class Vehicle {
         let marker = this.marker;
         let map = this.map;
 
+
+
+        // While there are any coords left
+        // Calculate percentage of total difference between current location, and the next "step"
+        // update marker location
+        // do until coords are empty
+
+        const totalAnimationTime = pathAsLatLongs.length * 2000; // Two seconds per co-ord transition
+        const movementSpeed = { latitude: 0.000005, longitude: 0.000005 };
+
+        console.log(this.position, pathAsLatLongs[0]);
+
         let start;
-        function animateMarker(timestamp) {
-            if (start === undefined) {
-                start = timestamp;
+        let timer = setInterval(()  => {
+
+            const target = pathAsLatLongs[0];
+            const originalPosition = { latitude: this.position.latitude, longitude: this.position.longitude };
+
+            let longitudeDirection = target.longitude > this.position.longitude ? 1 : -1;
+            let latitudeDirection = target.latitude > this.position.latitude ? 1 : -1;
+
+            this.position.latitude += movementSpeed.latitude * latitudeDirection;
+            this.position.longitude += movementSpeed.longitude * longitudeDirection;
+
+            this.marker.setLngLat([this.position.longitude, this.position.latitude ]);             
+            this.marker.addTo(this.map);
+
+            
+            let arrivedAtLat = false;
+            let arrivedAtLong = false;
+            if (latitudeDirection == 1) {
+                if (this.position.latitude > originalPosition.latitude) {
+                    arrivedAtLat = true;
+                }
+            }
+            
+            if (latitudeDirection == -1) {
+                if (this.position.latitude < originalPosition.latitude) {
+                    arrivedAtLat = true;
+                }
             }
 
-            const elapsed = timestamp - start;
-
-            /*marker.setLngLat([
-                Math.cos(timestamp / 1000) * radius,
-                Math.sin(timestamp / 1000) * radius
-            ]);
-             
-            marker.addTo(map);*/
-
-            console.log(elapsed);
-
-            if (elapsed < 2000) { 
-                window.requestAnimationFrame(animateMarker);
+            if (longitudeDirection == 1) {
+                if (this.position.longitude > originalPosition.longitude) {
+                    arrivedAtLong = true;
+                }
             }
-        }
-    
-        window.requestAnimationFrame(animateMarker);
+            
+            if (longitudeDirection == -1) {
+                if (this.position.longitude < originalPosition.longitude) {
+                    arrivedAtLong = true;
+                }
+            }
+
+            if (arrivedAtLat && arrivedAtLong) {
+                pathAsLatLongs.shift();
+            }
+
+
+            if (pathAsLatLongs.length == 0) {
+                clearInterval(timer);
+            }
+        }, 33);
 
     
         /*
