@@ -50,8 +50,8 @@ import { Vehicle } from "./Vehicle.js";
       }, true, map);
 
       riders.set(riderId, newRider);      
-      //newRider.line.setMap(map);
-      //map.panTo(newRider.line.getPath().getAt(1));
+      map.flyTo({center: [newRider.position.longitude, newRider.position.latitude], essential: true});
+
     }
 
     const rider = riders.get(riderId);
