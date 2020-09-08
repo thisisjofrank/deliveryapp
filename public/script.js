@@ -11,19 +11,30 @@ import { Vehicle } from "./Vehicle.js";
 
   const speed = document.getElementById("speed");
   const animation = document.getElementById("animation");
+  var smooth = animation.checked;
+
 
   animation.onchange = function(el) {
+    smooth = el.target.checked;
+
+
     console.log(el.target.checked);
   }
 
   speed.onchange = function(el) {
     console.log(el.target.checked);
+    if(el.target.checked){
+      channel.publish("update", "{ \"speed\": 2 }");
+    }else{
+      channel.publish("update", "{ \"speed\": 10 }");
+    }
+
   }
 
   // End of map setup.
 
   const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
- // const channelId = `[product:cttransit/gtfsr]vehicle:1450`;
+
 
   const channelId = `rider002.delivery223.locations`;
   
@@ -35,7 +46,7 @@ import { Vehicle } from "./Vehicle.js";
 
   const riders = new Map();
 
-channel.subscribe(function(message) {
+  channel.subscribe(function(message) {
     console.log("Received", message);
 
     const vehicle = JSON.parse(message.data);
@@ -57,32 +68,7 @@ channel.subscribe(function(message) {
     bus.move({ 
       latitude: vehicle.Lat,
       longitude: vehicle.Lon
-    });
+    },  document.getElementById("animation").checked);
   });
-
-  // channel.subscribe(function(message) {
-  //   console.log("Received", message);
-
-  //   const vehicle = message.data.vehicle;
-  //   const busId = vehicle.vehicle.id;
-
-  //   if (!busses.has(busId)) {
-  //     const newBus = new Vehicle(busId, { 
-  //       latitude: vehicle.position.latitude,
-  //       longitude: vehicle.position.longitude
-  //     }, true);
-
-  //     busses.set(busId, newBus);      
-  //     newBus.line.setMap(map);
-  //     map.panTo(newBus.line.getPath().getAt(1));
-  //   }
-
-  //   const bus = busses.get(busId);
-    
-  //   bus.move({ 
-  //     latitude: vehicle.position.latitude,
-  //     longitude: vehicle.position.longitude
-  //   });
-  // });
 
 })();
