@@ -30,6 +30,7 @@ export class GoogleMapsMarker {
         this.map = map;
         this.current = { lng: latLong.longitude, lat: latLong.latitude };
         this.marker = new google.maps.Marker({ icon: "driverN.png", map: map });
+        this.map.setZoom(16);
     }
 
     getCurrentLngLat() {
@@ -50,7 +51,6 @@ export class GoogleMapsMarker {
     }
     
     focus() {        
-        this.map.setZoom(16);
         this.map.panTo(this.current);
     }
 

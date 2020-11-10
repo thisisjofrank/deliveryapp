@@ -4,18 +4,14 @@ import { RiderConnection } from "./RiderConnection.js";
 (async function() {
 
   const position = { latitude: 0, longitude: 0 };
+  const mapElement = document.getElementById("map");
+  const map = new google.maps.Map(mapElement, { zoom: 3, center: { lat: position.latitude, lng: position.longitude }});
 
-  const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 3,
-    center: { lat: position.latitude, lng: position.longitude }
-  });
-
-  // End of map setup. 
   function createMapBoxMarker(latLng) {
     return new GoogleMapsMarker(map, { latitude: latLng.lat, longitude: latLng.lng });
   }
 
   const riderConnection = new RiderConnection(createMapBoxMarker);
-  await riderConnection.connect();
-    
+  await riderConnection.connect(); 
+   
 })();
