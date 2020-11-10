@@ -37,11 +37,33 @@ export class GoogleMapsMarker {
 
     updatePosition(targetLngLat, bearing) {
         this.marker.setPosition(targetLngLat);
-        console.log(this.marker);
         this.current = targetLngLat;
+
+        const compass = this.bearingToCompass(bearing);
+
+        if(bearing != 0 && compass != "") {
+            this.marker.setIcon(`driver${compass}.png`);        
+        }
     }
     
     focus() {
         this.map.panTo(this.current);
+    }
+
+    bearingToCompass(bearing) {
+        if (bearing > -45 && bearing < 45) {
+            return "N";
+        }
+        if (bearing > 45 && bearing < 135) {
+            return "E";
+        }
+        if ((bearing > 135 && bearing < 180) || (bearing < -135 && bearing > -180)) {
+            return "S";
+        }
+        if (bearing > -135 && bearing < -45) {
+            return "W";
+        }
+
+        return "";
     }
 }
