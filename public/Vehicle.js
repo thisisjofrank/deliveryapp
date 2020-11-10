@@ -1,4 +1,5 @@
 export class Vehicle {
+
     constructor(id, follow, markerWrapper) {
         this.id = id;
         this.follow = follow || false;
@@ -8,6 +9,10 @@ export class Vehicle {
         this.moveBuffer = [];
         this.animationRateMs = 20;
         this.animate();
+    }
+
+    get position() {
+        return this.marker.getCurrentLngLat();
     }
 
     async move(destinationLatLong) {
@@ -46,7 +51,9 @@ export class Vehicle {
             const targetLngLat = this.moveBuffer.shift();
 
             const bearing = this.getDirectionOfTravel(currentLngLat, targetLngLat);
+            
             this.marker.updatePosition(targetLngLat, bearing);
+            //this.marker.focus();
 
         }, this.animationRateMs);
     }
