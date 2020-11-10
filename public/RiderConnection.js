@@ -5,16 +5,29 @@ export class RiderConnection {
   constructor(markerFactory) {
     this.riders = new Map();
     this.markerFactory = markerFactory;
+    this.ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
+
+    const updateChannelButton = document.getElementById("updateChannelButton");
+    
+    if (updateChannelButton) {
+        updateChannelButton.addEventListener("click", () => {
+            this.connect(document.getElementById("channelID").value);
+        });
+    }
   }
 
-  async connect() { 
-    const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
-    const channelId = 'iosfakelocation';  
-    const channel = ably.channels.get(channelId);
-  
-    await channel.attach();
+  async connect(channelId) {
+    if (this.channelId) {
+        this.channel.unsubscribe();
+        await this.channel.detach();
+    }
 
-    channel.subscribe((message) => {
+    this.channelId = channelId ||'iosfakelocation';
+    this.channel = this.ably.channels.get(this.channelId);
+
+    await this.channel.attach();
+
+    this.channel.subscribe((message) => {
       console.log("Received", message);
       this.processMessage(message);
     });
@@ -42,6 +55,9 @@ export class RiderConnection {
       longitude: vehicle.lng
     };
 
-    rider.move(destination);
+    const animation = document.getElementById("animation");
+    const shouldSnap = !animation.checked;
+
+    rider.move(destination, shouldSnap);
   }
 }

@@ -21,14 +21,5 @@ import { RiderConnection } from "./RiderConnection.js";
 
   const riderConnection = new RiderConnection(createMapBoxMarker);
   await riderConnection.connect();
-
-  // Start sliders setup
-
-  const animation = document.getElementById("animation");
-  let smooth = animation.checked;
-
-  animation.onchange = function(el) {
-    smooth = el.target.checked;
-  }
     
 })();

@@ -15,7 +15,12 @@ export class Vehicle {
         return this.marker.getCurrentLngLat();
     }
 
-    async move(destinationLatLong) {
+    async move(destinationLatLong, snapToLocation = false) {
+
+        if(snapToLocation) {
+            this.moveBuffer = [ { lng: destinationLatLong.longitude, lat: destinationLatLong.latitude } ];
+            return;
+        }
 
         this.moveBuffer = [];
         const currentLngLat = this.marker.getCurrentLngLat();
@@ -53,7 +58,6 @@ export class Vehicle {
             const bearing = this.getDirectionOfTravel(currentLngLat, targetLngLat);
             
             this.marker.updatePosition(targetLngLat, bearing);
-            //this.marker.focus();
 
         }, this.animationRateMs);
     }

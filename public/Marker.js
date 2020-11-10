@@ -15,6 +15,7 @@ export class MapBoxMarker {
 
     updatePosition(targetLngLat, bearing) {
         this.marker.setLngLat(targetLngLat);
+        this.lastBearing = bearing;
         this.el.style.transform += `rotate(${bearing}deg)`;
     }
 
@@ -44,9 +45,12 @@ export class GoogleMapsMarker {
         if(bearing != 0 && compass != "") {
             this.marker.setIcon(`driver${compass}.png`);        
         }
+
+        this.focus();
     }
     
-    focus() {
+    focus() {        
+        this.map.setZoom(16);
         this.map.panTo(this.current);
     }
 
