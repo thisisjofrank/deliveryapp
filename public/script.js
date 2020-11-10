@@ -14,25 +14,36 @@ import { Vehicle } from "./Vehicle.js";
   });
 
   // End of map setup.
-
+ 
   const ably = new Ably.Realtime.Promise({ authUrl: '/api/createTokenRequest' });
-  const channelId = `rider002.delivery223.locations`;  
+  const channelId = 'iosfakelocation';  
   const channel = ably.channels.get(channelId);
 
   await channel.attach();
 
   const riders = new Map();
 
+  function makePosObject(coordinates) {
+    return { 
+      Lat: coordinates[1], 
+      Lng: coordinates[0] 
+    };
+  }
+
+
   channel.subscribe((message) => {
     console.log("Received", message);
 
-    const vehicle = JSON.parse(message.data);
-    const riderId = vehicle.id;
+    const parsedData = JSON.parse(message.data);
+    const coords = parsedData.geometry.coordinates;
+    const vehicle = makePosObject(coords);
+
+    const riderId = vehicle.id ?? "some-id";
 
     if (!riders.has(riderId)) {
       const newRider = new Vehicle(riderId, { 
         latitude: vehicle.Lat,
-        longitude: vehicle.Lon
+        longitude: vehicle.Lng
       }, true, map);
 
       riders.set(riderId, newRider);      
@@ -43,8 +54,25 @@ import { Vehicle } from "./Vehicle.js";
     
     rider.move({ 
       latitude: vehicle.Lat,
-      longitude: vehicle.Lon
+      longitude: vehicle.Lng
     });
   });
 
+    // Start sliders setup
+
+    const speed = document.getElementById("speed");
+    const animation = document.getElementById("animation");
+    let smooth = animation.checked;
+  
+    animation.onchange = function(el) {
+      smooth = el.target.checked;
+    }
+  
+    speed.onchange = function(el) {
+      if(el.target.checked){
+        channel.publish("update", "{ \"speed\": 2 }");
+      }else{
+        channel.publish("update", "{ \"speed\": 10 }");
+      }
+    }
 })();

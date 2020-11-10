@@ -7,7 +7,7 @@
     <script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
     
     <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
-    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script> 
+    <script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
 
     <script src="script.js" type="module"></script>
 
@@ -17,9 +17,24 @@
 </head>
 <body>
   <header>
-    <h1>Food Panda Support desk</h1>    
-    <div class="marker" data-direction="left"></div>
-    </header>
+    <h1>Food Panda Support desk</h1>
+    <div class="controls">
+      <h2>Accuracy Controls:</h2>
+        <label class="switch">
+          <span class="switch-text">Slow</span>
+          <input type="checkbox" id="speed">
+          <span class="slider round"></span>
+          <span class="switch-text">Fast</span>
+        </label>
+    
+        <label class="switch">
+          <span class="switch-text">Absolute</span>
+          <input type="checkbox" id="animation">
+          <span class="slider round"></span>
+          <span class="switch-text">Smooth</span>
+        </label>
+    </div>
+  </header>
 
     <div id="map"></div>
     

@@ -1,6 +1,6 @@
-# Ably JavaScript Google maps Demo
+# Ably JavaScript Mapbox Demo
 
-This is a demo of using an Ably data stream to place an animating marker on a Google Map
+This is a demo of using an Ably data stream to place an animating marker on a map using Mapbox
 
 ## To configure `TokenRequests`
 
@@ -17,10 +17,3 @@ In the project root run:
 ```bash
 npm run start
 ```
-
----
-
-
-- swap the google maps to mapbox maps
-- swap polyline google maps bit to mapbox polyline - routfinding stuff
-- vehcile follow line

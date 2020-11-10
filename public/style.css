@@ -37,7 +37,6 @@ h2 {
   }  
 
   
-/* The slider */
 .switch {
   position: relative;
   display: flex;
@@ -57,7 +56,6 @@ h2 {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Hide default HTML checkbox */
 .switch input {
   opacity: 0;
   width: 0;
@@ -110,23 +108,7 @@ input:checked + .slider:before {
 }
 
 .marker {
-  width: 40px;
-  height: 40px;
-  background: url(van.png);
-}
-
-[data-direction="down"] {
-  background-position: top center;
-}
-
-[data-direction="up"] {
-  background-position: center -40px ;
-}
-
-[data-direction="left"] {
-  background-position: center -80px;
-}
-
-[data-direction="right"] {
-  background-position: bottom center;
+  width: 20px;
+  height: 38px;
+  background: url(driverN.png);
 }
