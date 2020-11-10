@@ -1,16 +1,9 @@
 export class Vehicle {
-    constructor(id, latLong, follow, map) {
+    constructor(id, follow, markerWrapper) {
         this.id = id;
         this.follow = follow || false;
 
-        this.map = map;
-
-        this.el = document.createElement('div');
-        this.el.className = 'marker';
-
-        this.marker = new mapboxgl.Marker(this.el)
-            .setLngLat([latLong.longitude, latLong.latitude])
-            .addTo(this.map);
+        this.marker = markerWrapper;
 
         this.moveBuffer = [];
         this.animationRateMs = 20;
@@ -20,7 +13,7 @@ export class Vehicle {
     async move(destinationLatLong) {
 
         this.moveBuffer = [];
-        const currentLngLat = this.marker.getLngLat();
+        const currentLngLat = this.marker.getCurrentLngLat();
         
         var path = turf.lineString([
             [currentLngLat.lng, currentLngLat.lat], 
@@ -49,14 +42,11 @@ export class Vehicle {
                 return; 
             }
 
-            const currentLngLat = this.marker.getLngLat();
+            const currentLngLat = this.marker.getCurrentLngLat();
             const targetLngLat = this.moveBuffer.shift();
 
             const bearing = this.getDirectionOfTravel(currentLngLat, targetLngLat);
-            this.el.setAttribute("data-direction", bearing);
-
-            this.marker.setLngLat(targetLngLat);
-            this.el.style.transform += `rotate(${bearing}deg)`;
+            this.marker.updatePosition(targetLngLat, bearing);
 
         }, this.animationRateMs);
     }
