@@ -28,7 +28,6 @@ export class RiderConnection {
     await this.channel.attach();
 
     this.channel.subscribe((message) => {
-      console.log("Received", message);
       this.processMessage(message);
     });
   }
